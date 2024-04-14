@@ -1,0 +1,39 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run uvicorn",
+            "type": "shell",
+            "command": "uvicorn app.main:app --reload",
+            "problemMatcher": [],
+            "group": "build",
+            "presentation": {
+                "group": "main"
+            }
+        },
+        {
+            "label": "Run celery",
+            "type": "shell",
+            "command": "celery -A app.tasks.celery:celery_app worker --loglevel=INFO --pool=solo",
+            "problemMatcher": [],
+            "group": "build",
+            "presentation": {
+                "group": "main"
+            }
+        },
+        {
+            "label": "Run app",
+            "dependsOn": [
+                "Run celery",
+                "Run uvicorn"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

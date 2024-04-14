@@ -1,0 +1,30 @@
+version: '3.9'
+services:
+  redis:
+    image: redis:latest
+    container_name: booking_redis
+
+  booking:
+    image: booking_app
+    build: 
+      context: .
+    container_name: booking_app
+    command: gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    ports:
+      - 7777:8000
+
+  celery:
+    image: booking_app
+    build:
+      context: .
+    container_name: booking_celery
+    command: sh -c "celery --app=app.tasks.celery:celery_app worker -l INFO"
+    env_file:
+      - .env
+    depends_on:
+      - booking
+      - redis
